@@ -1,11 +1,10 @@
 defmodule HelloWeb.ThermostatLive do
     use Phoenix.LiveView
   
-    def render(assets) do
+    def render(assigns) do
         IO.puts "Render"
-      Phoenix.View.render(HelloWeb.LineView, "line.html", assets)
+        Phoenix.View.render(HelloWeb.LineView, "line.html", assigns)
     end
-
 
     def mount(assigns, socket) do
         IO.puts "Mount"
@@ -16,7 +15,6 @@ defmodule HelloWeb.ThermostatLive do
             :undefined ->
                 {:ok, assign(socket, message: "Line table doesn't exist", tree: [])}
             _ -> 
-              # tree = Hello.StoreInterface.getTree();
               tree = :ets.lookup(:tree, "data_tree")
               case tree do
                 [{"data_tree", data}] ->
@@ -24,12 +22,6 @@ defmodule HelloWeb.ThermostatLive do
                 _ -> 
                     {:ok, assign(socket,  message: "Line table doesn't exist", tree: [])}
               end
-              # line = :ets.tab2list(:line)
-              # IO.puts "LINE"
-              # IO.inspect line
-              # render(conn, "index.html", message: "Line Exists", lines: line, tree: tree)
-              # render(conn, "index.html", message: "Line Exists", lines: [], tree: [])
-              # "Line exist"
         end
 
 
@@ -46,6 +38,12 @@ defmodule HelloWeb.ThermostatLive do
       def handle_info(:update, socket) do
         IO.puts "Handling Info"
         tree = :ets.lookup(:tree, "data_tree")
-        {:noreply, assign(socket, :tree, tree)}
+              case tree do
+                [{"data_tree", data}] ->
+                    {:noreply, assign(socket, :tree, data)}
+                _ -> 
+                    {:noreply, assign(socket, :tree, [])}
+              end
+        # {:noreply, assign(socket, :tree, data)}
       end
   end

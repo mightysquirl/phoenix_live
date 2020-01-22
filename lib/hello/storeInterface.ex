@@ -3,8 +3,23 @@ defmodule Hello.StoreInterface do
 
     def start_link(store) do
         {:ok, reg} = GenServer.start_link(__MODULE__, store)
+        Enum.map(
+            [:line, :discipline, :tournament, :event, :market, :tree],
+            fn table ->
+                Hello.StoreInterface.init_table(table)
+            end
+        )
         Hello.Updater.start_link
         {:ok, reg}
+    end
+
+    def init_table(table) do
+        case :ets.whereis table do
+            :undefined ->
+                :ets.new(table, [:public, :named_table, read_concurrency: true])
+            _ ->
+                IO.puts "Table #{table} already created"
+        end
     end
 
     def getTree() do
@@ -84,18 +99,10 @@ defmodule Hello.StoreInterface do
                 )
             end
         )
-        tableExist = :ets.whereis :tree
-        case tableExist do
-            :undefined ->
-                :ets.new(:tree, [:public, :named_table, read_concurrency: true])
-                :ets.insert(:tree, {"data_tree", tree})
-            _ ->
-                :ets.insert(:tree, {"data_tree", tree})
-        end
+        :ets.insert(:tree, {"data_tree", tree})
     end
 
     def add(pid, table, key, value) do
-        {:ok, state} = Hello.StoreInterface.create(pid, table)
         ins = :ets.insert(String.to_atom(table), {key, value})
         Hello.Updater.inc
     end
@@ -103,14 +110,6 @@ defmodule Hello.StoreInterface do
     def delete(table, key) do
         :ets.delete(table, key)
         Hello.Updater.inc
-    end
-
-    @doc """
-    Ensures there is a table created in the ETS with given `name`
-    """
-    def create(server, name) do
-        state = GenServer.call(server, {:create, name})
-        {:ok, state}
     end
 
     @impl true
@@ -128,17 +127,5 @@ defmodule Hello.StoreInterface do
         Hello.Updater.check
         schedule_check
         {:noreply, state}
-    end
-
-    @impl true
-    def handle_call({:create, store}, _from, state) do
-        tableExist = :ets.whereis String.to_atom(store)
-        case tableExist do
-            :undefined ->
-                :ets.new(String.to_atom(store), [:public, :named_table, read_concurrency: true])
-                {:reply, Map.put(state, store, String.to_atom(store)), Map.put(state, store, String.to_atom(store))}
-            _ -> 
-                {:reply, state, state}
-        end
     end
 end

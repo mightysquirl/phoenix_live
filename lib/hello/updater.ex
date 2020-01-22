@@ -5,6 +5,7 @@ defmodule Hello.Updater do
     Starts bucket with given `state`
     """
     def start_link do
+        IO.puts "Starting Uptater"
         Agent.start_link(fn -> %{"last_update" => 0, "last_message" => 0} end, name: __MODULE__)
     end
 
