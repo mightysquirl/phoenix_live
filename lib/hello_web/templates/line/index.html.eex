@@ -1,0 +1,81 @@
+
+<div class="line__head"><%= @message %></div>
+<div class="board__content">
+  <%= for line <- @tree do %>
+      <div class="board__line board__line_prematch">
+        <div class="line__head">
+          <div class="line__title"><%= line["id"] %></div>
+        </div>
+        <div class="line__content" style="display: flex; flex-direction: column;">
+          <%= for discipline <- line["disciplines"] do %>
+            <div class="line__sport">
+              <div class="sport__head">
+                <h3 class="sport__title">
+                  <span class="sport-title__icon sport-title__icon_csgo"></span> <%= discipline["name"] %>
+                </h3>
+              </div>
+              <%= for tournament <- discipline["tournaments"] do %>
+                <div class="sport__event">
+                  <div class="event__head board-row board-row_head">
+                    <div class="board-col">
+                      <div class="event__title">
+                        <span class="event-title__icon sport-title__icon_csgo"></span><%= tournament["name"] %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="event__content">
+                    <div class="event-content__inner">
+                      <div class="event__matches">
+                        <%= for event <- tournament["events"] do %>
+                          <div class="match board-row board-row_content">
+                            <div class="board-col match-info match-info_live">
+                              <div class="match__link">
+                                <div class="match-info__competitors">
+                                  <div class="match-info__competitor">
+                                    <div class="competitor__logo_wrapper">
+                                      <img class="competitor__logo" src="https://ceh9.bet/icons/csgo/60/234787.png">
+                                    </div>
+                                    <div class="competitor__name"><%= event["team1"]["name"]%></div>
+                                  </div>
+                                  <span class="competitors__divider">vs</span>
+                                  <div class="match-info__competitor">
+                                    <div class="competitor__logo_wrapper">
+                                      <img class="competitor__logo" src="https://ceh9.bet/icons/csgo/60/252038.png">
+                                    </div>
+                                    <div class="competitor__name"><%= event["team2"]["name"]%></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="board-col board-col__match-markets">
+                              <%= for market <- event["markets"] do %>
+                                <div class="board-col__inner">
+                                  <div class="market-group">
+                                    <div class="flex flex-grow">
+                                      <%= for outcome <- market["outcomes"] do %>
+                                        <div class="outcome equal" type="button">
+                                          <span class="outcome__status"><%= outcome["shortName"] %></span>
+                                          <span class="outcome__number"><%= outcome["price"] %></span>
+                                        </div>
+                                      <% end %>
+                                    </div>
+                                  </div>
+                                </div>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+  <% end %>
+
+</div>
+<div class=""></div>
+
