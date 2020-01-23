@@ -6,8 +6,9 @@ defmodule Hello.Emitter do
     Starts the server
     """
     def start_link(_opts) do
-        {:ok, storeInterface} = Hello.StoreInterface.start_link(%{})
-        WebSockex.start_link("wss://ceh9.bet/ws/ru?thresholdTimeout=100&threshold=2", __MODULE__, {:storeInterface, storeInterface})
+        # IO.puts "Emitter Start Link"
+        # {:ok, storeInterface} = Hello.StoreInterface.start_link(%{})
+        WebSockex.start_link("wss://gorilla.com/ws/ru?thresholdTimeout=100&threshold=2", __MODULE__, {})
     end
 
     @doc """
@@ -22,8 +23,7 @@ defmodule Hello.Emitter do
     end
 
     def handle_frame({:text, msg}, state) do
-        {:storeInterface, pid} = state
-        Hello.Emitter.parseMessage(msg, pid);
+        Hello.Emitter.parseMessage(msg);
         {:ok, state}
     end
 
@@ -43,34 +43,35 @@ defmodule Hello.Emitter do
     end
 
     # Data parsing
-    def parseMessage(message, pid) do
+    def parseMessage(message) do
         {:ok, msgDecoded} = Jason.decode(message)
         case msgDecoded do
             ["batch" | [tail]] ->
-                Enum.each(tail, fn data -> Hello.Emitter.parseAndSubscribe(data, pid) end)
+                Enum.each(tail, fn data -> Hello.Emitter.parseAndSubscribe(data) end)
             _ ->
-                IO.puts "not tail"
+                # IO.puts "not tail"
         end
     end
 
-    def parseAndSubscribe(message, pid) do
+    def parseAndSubscribe(message) do
         [table, id, action, data] = message
         # IO.puts "MESSAGE"
         # IO.inspect message
+        table = String.to_atom(table)
         case action do
             1 -> 
                 # IO.puts "ACTION 1"
                 Hello.Emitter.addSubs(message)
-                Hello.StoreInterface.add(pid, table, id, data)
+                Hello.StoreInterface.add(table, id, data)
             2 ->
                 # IO.puts "ACTION 2"
                 Hello.Emitter.addSubs(message)
-                Hello.StoreInterface.add(pid, table, id, data)
+                Hello.StoreInterface.add(table, id, data)
             3 ->
                 # IO.puts "ACTION 3"
                 Hello.StoreInterface.delete(table, id)
             _ ->
-                IO.puts "action undefined"
+                # IO.puts "action undefined"
         end
     end
 
@@ -99,5 +100,10 @@ defmodule Hello.Emitter do
                 Hello.Emitter.subscribe(name, ids)
             end
         end
+    end
+
+    def terminate(reason, state) do 
+        IO.puts "Emitter Terminated"
+        IO.inspect reason
     end
 end

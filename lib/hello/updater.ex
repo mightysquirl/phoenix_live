@@ -43,7 +43,7 @@ defmodule Hello.Updater do
     Checks if there is new messages. If there is - stores new line tree in :ets
     """
     def check do
-        IO.puts "Update check"
+        # IO.puts "Update check"
         upd = Hello.Updater.get("last_update")
         msg = Hello.Updater.get("last_message")
         if (msg > upd) do

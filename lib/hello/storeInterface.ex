@@ -18,7 +18,7 @@ defmodule Hello.StoreInterface do
             :undefined ->
                 :ets.new(table, [:public, :named_table, read_concurrency: true])
             _ ->
-                IO.puts "Table #{table} already created"
+                # IO.puts "Table #{table} already created"
         end
     end
 
@@ -67,6 +67,7 @@ defmodule Hello.StoreInterface do
                                         data = Map.put(
                                             data,
                                             "events",
+                                            # lineEvents
                                             Enum.map(
                                                 lineEvents,
                                                 fn {_, data} ->
@@ -102,8 +103,8 @@ defmodule Hello.StoreInterface do
         :ets.insert(:tree, {"data_tree", tree})
     end
 
-    def add(pid, table, key, value) do
-        ins = :ets.insert(String.to_atom(table), {key, value})
+    def add(table, key, value) do
+        ins = :ets.insert(table, {key, value})
         Hello.Updater.inc
     end
 
@@ -114,6 +115,7 @@ defmodule Hello.StoreInterface do
 
     @impl true
     def init(store) do
+        # IO.puts "Store Interface INIT"
         schedule_check
         {:ok, store}
     end

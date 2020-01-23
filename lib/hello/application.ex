@@ -7,6 +7,7 @@ defmodule Hello.Application do
   # use Hello.WsClient
 
   def start(_type, _args) do
+    # IO.puts "SUperVisoR"
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
@@ -16,7 +17,8 @@ defmodule Hello.Application do
       # Starts a worker by calling: Hello.Worker.start_link(arg)
       # {Hello.Worker, arg},
       # { Hello.Emitter, ["WebSockex is Great"] }
-      {Hello.Emitter, []}
+      {Hello.Emitter, []},
+      {Hello.StoreInterface, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
