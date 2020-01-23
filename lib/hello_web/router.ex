@@ -18,10 +18,11 @@ defmodule HelloWeb.Router do
   scope "/", HelloWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", ThermostatLive
+    # get "/", PageController, :index
 
     get "/line", LineController, :index
-    live "/thermostat", ThermostatLive
+    # live "/thermostat", ThermostatLive
   end
 
   # Other scopes may use custom stacks.
