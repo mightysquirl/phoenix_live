@@ -23,11 +23,13 @@ defmodule Hello.StoreInterface do
     end
 
     def getTree() do
+        line_pattern = %{"1" => 2, "2" => 1, "3" => 3}
         lines = :ets.tab2list(:line)
         disciplines = :ets.tab2list(:discipline)
         tournaments = :ets.tab2list(:tournament)
         events = :ets.tab2list(:event)
         markets = :ets.tab2list(:market)
+        lines = Enum.sort_by(lines, fn {id, _} -> line_pattern[id] end)
         tree = Enum.map(
             lines,
             fn {_, data} ->
